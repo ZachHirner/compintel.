@@ -32,7 +32,7 @@ def scrape_site(url):
 
 if __name__ == "__main__":
     # Targeting OpenText's ValueEdge / DevOps Quality product page
-    target_url = "https://www.opentext.com/products/valueedge"
+    target_url = "https://www.opentext.com/products/listing"
     print(f"Starting cloud scrape of {target_url}...")
     result_text = scrape_site(target_url)
     
