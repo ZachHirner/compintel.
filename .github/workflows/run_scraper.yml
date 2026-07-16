@@ -1,0 +1,46 @@
+name: Run Weekly CI Scraper
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 9 * * 1'
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Google Chrome and Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+        pip install beautifulsoup4 undetected-chromedriver
+
+    - name: Run Scraper Script
+      run: python scraper.py
+
+    - name: Save Scraped Data to Repo
+      run: |
+        git config --global user.name "CI Bot"
+        git config --global user.email "ci-bot@github.com"
+        
+        git add raw_competitor_data.txt
+        
+        # Commit only if the file actually changed, preventing pipeline failures
+        git commit -m "Automated CI Scrape Update" || echo "No changes to commit"
+        
+        git push origin main
